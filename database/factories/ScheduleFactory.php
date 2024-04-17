@@ -17,7 +17,8 @@ class ScheduleFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'day_of_week' => $this->faker->dateTimeBetween('last Monday', 'next Sunday')->format('l'),
+            'start_time' => $this->faker->time('H:i'),
         ];
     }
 }
