@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Schedule;
 use App\Models\Service;
 use App\Models\Worker;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
+use DateTime;
 
 class PageController extends Controller
 {
@@ -39,29 +39,26 @@ class PageController extends Controller
 
     public function serviceWorker(Service $service, Worker $worker)
     {
-        $schedules = Schedule::all()->sort(function ($a, $b) {
-            $dayOrder = [
-                'Monday' => 1,
-                'Tuesday' => 2,
-                'Wednesday' => 3,
-                'Thursday' => 4,
-                'Friday' => 5,
-                'Saturday' => 6,
-                'Sunday' => 7,
+        $schedules = Schedule::query()->get()->all();
+        $timeslots = [];
+
+        foreach ($schedules as $schedule) {
+            $start = new DateTime($schedule->start_time);
+            $end = new DateTime($schedule->end_time);
+            $dayOfWeek = $schedule->day_of_week;
+            $timeSlots = $this->getTimeSlots($service->duration, $start, $end);
+
+            $timeslots[] = [
+                'id' => $schedule->id,
+                'day' => $dayOfWeek,
+                'time_slots' => $timeSlots,
             ];
-
-            $dayComparison = $dayOrder[$a->day_of_week] - $dayOrder[$b->day_of_week];
-            if ($dayComparison !== 0) {
-                return $dayComparison;
-            }
-
-            return strcmp($a->start_time, $b->start_time);
-        });
+        }
 
         $cookie = cookie('worker_id', $worker->id);
 
         return response()
-            ->view('pages.schedules', compact('schedules', 'service', 'worker'))
+            ->view('pages.schedules', compact('timeslots', 'service', 'worker'))
             ->withCookie($cookie);
     }
 
@@ -77,5 +74,29 @@ class PageController extends Controller
         return response()
             ->view('pages.confirmation', compact('schedule', 'worker', 'service'))
             ->withCookie($cookie);
+    }
+
+    private function getTimeSlots(int $interval, DateTime $start, DateTime $end): array
+    {
+        $startTime = $start->format('H:i');//00:00
+        $endTime = $end->format('H:i');
+        $timeSlots = [];
+
+        while (strtotime($startTime) <= strtotime($endTime)) {
+            $start = $startTime;
+            $followingTime = strtotime('+' . $interval . 'minutes', strtotime($startTime));
+            $end = date('H:i', $followingTime);
+            $startTime = date('H:i', $followingTime);
+
+            if (strtotime($startTime) <= strtotime($endTime)) {
+
+                $timeSlots[] = [
+                    'start_time' => $start,
+                    'end_time' => $end,
+                ];
+            }
+        }
+
+        return $timeSlots;
     }
 }

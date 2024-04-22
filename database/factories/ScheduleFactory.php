@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Schedule;
+use App\Models\Worker;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +19,15 @@ class ScheduleFactory extends Factory
      */
     public function definition(): array
     {
+        $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        $startTime = Carbon::createFromFormat('H:i', $this->faker->time('H:i'))->format('H:i:s');
+        $endTime = Carbon::createFromFormat('H:i', $this->faker->time('H:i'))->format('H:i:s');
+
         return [
-            'day_of_week' => $this->faker->dateTimeBetween('last Monday', 'next Sunday')->format('l'),
-            'start_time' => $this->faker->time('H:i'),
+            'day_of_week' => $this->faker->randomElement($daysOfWeek),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
         ];
     }
 }

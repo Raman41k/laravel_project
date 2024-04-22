@@ -1,12 +1,25 @@
 @extends('welcome')
 @section('content')
-    <ul id="timetable" class="grid w-full grid-cols-1 gap-2 mt-5">
-        @foreach($schedules as $schedule)
-            <li>
-                <a href="{{ route('services.confirmation', ['schedule' => $schedule]) }}" class="inline-flex items-center justify-center w-full p-2 text-sm font-medium text-center bg-white border rounded-lg cursor-pointer text-blue-600 border-blue-600 dark:hover:text-white dark:border-blue-500 dark:peer-checked:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-600 hover:text-white peer-checked:text-white hover:bg-blue-500 dark:text-blue-500 dark:bg-gray-900 dark:hover:bg-blue-600 dark:hover:border-blue-600 dark:peer-checked:bg-blue-500">
-                    {{ date('H:i', strtotime($schedule->start_time)) }} - {{ $schedule->day_of_week }}
-                </a>
-            </li>
-        @endforeach
-    </ul>
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+        <h2 class="text-lg font-bold mb-4">Time Slots</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach ($timeslots as $timeslot)
+                @if($timeslot['time_slots'])
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-700 font-semibold">{{ $timeslot['day'] }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            @foreach ($timeslot['time_slots'] as $time)
+                                <button class="bg-blue-100 rounded-lg p-2 text-center">
+                                    <a href="{{ route('services.confirmation', ['schedule' => $timeslot['id']]) }}"
+                                       class="text-blue-500">{{ $time['start_time'] }}</a>
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
 @endsection
