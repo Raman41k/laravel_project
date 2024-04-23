@@ -39,7 +39,7 @@ class PageController extends Controller
 
     public function serviceWorker(Service $service, Worker $worker)
     {
-        $schedules = Schedule::query()->get()->all();
+        $schedules = Schedule::all();
         $timeslots = [];
 
         foreach ($schedules as $schedule) {
@@ -68,8 +68,8 @@ class PageController extends Controller
         $worker_id = request()->cookie('worker_id');
         $service_id = request()->cookie('service_id');
 
-        $worker = Worker::query()->findOrFail($worker_id);
-        $service = Service::query()->findOrFail($service_id);
+        $worker = Worker::findOrFail($worker_id);
+        $service = Service::findOrFail($service_id);
 
         return response()
             ->view('pages.confirmation', compact('schedule', 'worker', 'service'))
