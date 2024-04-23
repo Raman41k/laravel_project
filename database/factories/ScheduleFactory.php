@@ -20,14 +20,20 @@ class ScheduleFactory extends Factory
     public function definition(): array
     {
         $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $workers = Worker::all();
 
-        $startTime = Carbon::createFromFormat('H:i', $this->faker->time('H:i'))->format('H:i:s');
-        $endTime = Carbon::createFromFormat('H:i', $this->faker->time('H:i'))->format('H:i:s');
+        $schedules = [];
+        foreach ($workers as $worker) {
+            foreach ($daysOfWeek as $day) {
+                $schedules[] = [
+                    'worker_id' => $worker->id,
+                    'day_of_week' => $day,
+                    'start_time' => $this->faker->time('H:i'),
+                    'end_time' => $this->faker->time('H:i'),
+                ];
+            }
+        }
 
-        return [
-            'day_of_week' => $this->faker->randomElement($daysOfWeek),
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-        ];
+        return $schedules;
     }
 }

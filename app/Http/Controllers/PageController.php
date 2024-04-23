@@ -39,7 +39,7 @@ class PageController extends Controller
 
     public function serviceWorker(Service $service, Worker $worker)
     {
-        $schedules = Schedule::all();
+        $schedules = Schedule::query()->where('worker_id', '=', $worker->id)->get();
         $timeslots = [];
 
         foreach ($schedules as $schedule) {

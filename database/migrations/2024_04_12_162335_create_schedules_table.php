@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('worker_id');
+            $table->foreign('worker_id')->references('id')->on('workers')->onDelete('cascade');
             $table->string('day_of_week');
             $table->time('start_time');
             $table->time('end_time');
