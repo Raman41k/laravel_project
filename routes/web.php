@@ -10,4 +10,7 @@ Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/service/{service}', [PageController::class, 'service'])->name('services.service');
 Route::get('/services/{service}/workers', [PageController::class, 'service'])->name('services.workers');
 Route::get('/services/{service}/workers/{worker}', [PageController::class, 'serviceWorker'])->name('services.worker');
-Route::get('/confirmation/{schedule}', [PageController::class, 'confirmation'])->name('services.confirmation');
+
+Route::post('/schedule', [PageController::class, 'postSchedule'])->name('post.schedule');
+
+Route::get('/confirmation', [PageController::class, 'confirmation'])->name('services.confirmation');
