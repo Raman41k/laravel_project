@@ -15,16 +15,19 @@
                     Make order!
                 </a>
 
-                <div class="bg-white">
-                    You are:
+                <div class="my-10">
                     @if(Auth::user()->isManager())
-                        Manager
+                        <a href="{{ route('cpanel') }}" class="block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md shadow-md transition duration-300 ease-in-out">
+                            C panel
+                        </a>
                     @endif
                     @if(Auth::user()->isAdmin())
-                        Admin
+                        <a href="{{ route('cpanel') }}" class="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md shadow-md transition duration-300 ease-in-out">
+                            C panel
+                        </a>
                     @endif
                     @if(Auth::user()->isAssistant())
-                        Assistant
+                       You are: Assistant
                     @endif
                 </div>
 
