@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             VacationSeeder::class,
             RoleSeeder::class,
             RoleUserSeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }
