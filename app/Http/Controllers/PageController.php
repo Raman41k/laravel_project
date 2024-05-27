@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Schedule;
 use App\Models\Service;
 use App\Models\Worker;
+use Carbon\Carbon;
+use DateTimeZone;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use DateTime;
 
@@ -39,41 +42,50 @@ class PageController extends Controller
 
     public function serviceWorker(Service $service, Worker $worker)
     {
-        $schedules = Schedule::query()->where('worker_id', '=', $worker->id)->get();
-        $timeslots = [];
+//        $schedules = Schedule::query()->where('worker_id', '=', $worker->id)->get();
+        $vacationDates = [];
+        $lastVacation = $worker->vacations->first();
 
-        foreach ($schedules as $schedule) {
-            $start = new DateTime($schedule->start_time);
-            $end = new DateTime($schedule->end_time);
-            $dayOfWeek = $schedule->day_of_week;
-            $timeSlots = $this->getTimeSlots($service->duration, $start, $end);
+        if ($lastVacation) {
+            $startDate = new DateTime($lastVacation->start_date);
+            $vacationDates[] = $startDate->format('Y-m-d');
 
-            $timeslots[] = [
-                'id' => $schedule->id,
-                'day' => $dayOfWeek,
-                'time_slots' => $timeSlots,
-            ];
+            for ($i = 1; $i < $lastVacation->days; $i++) {
+                $nextDate = clone $startDate;
+                $nextDate->modify("+{$i} day");
+                $vacationDates[] = $nextDate->format('Y-m-d');
+            }
         }
-
+//        foreach ($schedules as $schedule) {
+//            $start = new DateTime($schedule->start_time);
+//            $end = new DateTime($schedule->end_time);
+//            $dayOfWeek = $schedule->day_of_week;
+//            $timeSlots = $this->getTimeSlots($service->duration, $start, $end);
+//
+//            $timeslots[] = [
+//                'id' => $schedule->id,
+//                'day' => $dayOfWeek,
+//                'time_slots' => $timeSlots,
+//            ];
+//        }
         $cookie = cookie('worker_id', $worker->id);
 
         return response()
-            ->view('pages.schedules', compact('timeslots', 'service', 'worker'))
+            ->view('pages.schedules', compact( 'vacationDates', 'service', 'worker'))
             ->withCookie($cookie);
     }
 
-    public function confirmation(Schedule $schedule)
+    public function confirmation()
     {
-        $cookie = cookie('schedule_id', $schedule->id);
         $worker_id = request()->cookie('worker_id');
         $service_id = request()->cookie('service_id');
+        $schedule_id = request()->cookie('schedule_id');
 
         $worker = Worker::findOrFail($worker_id);
         $service = Service::findOrFail($service_id);
+        $schedule = Schedule::findOrFail($schedule_id);
 
-        return response()
-            ->view('pages.confirmation', compact('schedule', 'worker', 'service'))
-            ->withCookie($cookie);
+        return view('pages.confirmation', compact('schedule', 'worker', 'service'));
     }
 
     private function getTimeSlots(int $interval, DateTime $start, DateTime $end): array
@@ -98,5 +110,27 @@ class PageController extends Controller
         }
 
         return $timeSlots;
+    }
+
+    public function postSchedule(Request $request)
+    {
+        date_default_timezone_set('Europe/Kiev');
+        if ($request->ajax()) {
+            $worker_id = request()->cookie('worker_id');
+
+            $dateString = $request->date;
+            $date = DateTime::createFromFormat('d/m/Y H:i', $dateString, new DateTimeZone('Europe/Kiev'));
+
+            $schedule = Schedule::create([
+                'worker_id' => $worker_id,
+                'date' => $date,
+            ]);
+
+            $cookie = cookie('schedule_id', $schedule->id);
+
+            return redirect()->route('services.confirmation')->withCookie($cookie);
+        } else {
+            abort(400, 'Bad request');
+        }
     }
 }

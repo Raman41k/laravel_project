@@ -10,8 +10,7 @@ class Schedule extends Model
     use HasFactory;
 
     protected $fillable = [
-        'day_of_week',
-        'start_time',
-        'end_time'
+        'worker_id',
+        'date'
     ];
 }

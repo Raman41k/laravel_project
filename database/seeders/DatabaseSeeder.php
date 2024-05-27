@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             WorkerSeeder::class,
             ServiceSeeder::class,
-            ScheduleSeeder::class,
+//            ScheduleSeeder::class,
+            VacationSeeder::class
         ]);
     }
 }
