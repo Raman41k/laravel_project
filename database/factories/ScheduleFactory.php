@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Schedule;
+use App\Models\Worker;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +19,21 @@ class ScheduleFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            'day_of_week' => $this->faker->dateTimeBetween('last Monday', 'next Sunday')->format('l'),
-            'start_time' => $this->faker->time('H:i'),
-        ];
+        $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $workers = Worker::all();
+
+        $schedules = [];
+        foreach ($workers as $worker) {
+            foreach ($daysOfWeek as $day) {
+                $schedules[] = [
+                    'worker_id' => $worker->id,
+                    'day_of_week' => $day,
+                    'start_time' => $this->faker->time('H:i'),
+                    'end_time' => $this->faker->time('H:i'),
+                ];
+            }
+        }
+
+        return $schedules;
     }
 }
