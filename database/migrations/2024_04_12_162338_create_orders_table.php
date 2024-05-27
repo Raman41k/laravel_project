@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('service_id');
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
             $table->unsignedBigInteger('timeslot');
-            $table->foreign('timeslot_id')->references('id')->on('schedules')->onDelete('cascade');
+            $table->foreign('id')->references('id')->on('schedules')->onDelete('cascade');
             $table->float('price');
             $table->timestamps();
         });
